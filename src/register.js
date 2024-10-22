@@ -3,9 +3,13 @@ import React, { useState } from 'react';
 const RegistrationPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
     const handleRegistration = () => {
-        // Handle login logic here
+        if (!email || !password) {
+            setError('Email and password are required');
+            return;
+        }
 
         fetch('http://localhost:3000/register', {
             method: 'POST',
@@ -17,8 +21,9 @@ const RegistrationPage = () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('Registered successful');
+                    console.log('Registered successfully');
                 } else {
+                    console.log(data.message);
                     console.log('Registration failed');
                 }
             })
@@ -29,7 +34,8 @@ const RegistrationPage = () => {
 
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>Login</h1>
+            <h1 style={styles.title}>Register</h1>
+            {error && <p style={styles.error}>{error}</p>}
             <input
                 style={styles.input}
                 type="email"
@@ -44,7 +50,7 @@ const RegistrationPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <button onClick={handleRegistration}>Register</button>
+            <button onClick={handleRegistration} disabled={!email || !password}>Register</button>
         </div>
     );
 };
@@ -72,6 +78,10 @@ const styles = {
         width: '100%',
         maxWidth: '300px',
     },
+    error: {
+        color: 'red',
+        marginBottom: '12px',
+    },
 };
 
-export default LoginPage;
+export default RegistrationPage;

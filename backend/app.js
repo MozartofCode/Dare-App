@@ -3,7 +3,7 @@ require('dotenv').config();  // Load environment variables
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
-const User = require('../models/user'); // Import User model
+const User = require('./models/user'); // Import User model
 
 const port = process.env.PORT || 3000;
 
