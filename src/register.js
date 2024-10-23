@@ -23,7 +23,7 @@ const RegistrationPage = () => {
                 if (data.success) {
                     console.log('Registered successfully');
                 } else {
-                    console.log(data.message);
+                    console.log(data.error);
                     console.log('Registration failed');
                 }
             })
