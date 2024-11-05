@@ -43,7 +43,8 @@ def suggest_dare():
     # TASKS    
     suggest = Task(
         description=(
-            "Suggest a dare to the user. The agent should provide a dare that is fun and safe"
+            "Suggest a dare to the user. The agent should provide a dare that is fun and safe and the user can prove they did it by "
+             " uploading one photo"
         ),
         expected_output=(
             "One sentence answer suggesting a dare that is fun and safe in the format: 'I dare you to ...'"
@@ -66,8 +67,8 @@ def suggest_dare():
 
 # This function creates and uses an AI agent to evaluate a dare (safe or not)
 # :param: dare_comment: The dare to be evaluated
-# :return: The evaluation of the dare (safe or not)
-def evaluate_dare(dare_comment):
+# :return: The evaluation of the dare (True for safe or False for not safe)
+def evaluate_dare(dare_suggestion):
         
     # Defining the Tools
     search_tool = SerperDevTool()
@@ -104,18 +105,33 @@ def evaluate_dare(dare_comment):
         verbose=True
     )
 
-    dare = {'dare': dare_comment}
+    dare = {'dare': dare_suggestion}
 
     # RUN
     result = dare_crew.kickoff(inputs=dare)
-    return result
 
+    return result == "Safe"
+
+
+
+
+#
+# :param: dare_suggestion: The dare to be evaluated
+# :return: The evaluation of the dare (True or False)
+def is_provable(dare_suggestion):
+    
+    
+    
+    
+    
+    result = ""
+    return result == "Provable"
 
 
 # TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
 
-def check_completion(video_path, dare_prompt):
+def check_completion(image_path, dare_prompt):
     pass
 
-def interpret_video(video_path):
+def interpret_video(image_path):
     pass
