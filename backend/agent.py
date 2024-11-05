@@ -10,8 +10,6 @@ from crewai_tools import ScrapeWebsiteTool, SerperDevTool
 import warnings
 warnings.filterwarnings('ignore')
 import os
-from pydantic import BaseModel
-
 
 load_dotenv()
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -66,7 +64,7 @@ def suggest_dare():
 
 
 # This function creates and uses an AI agent to evaluate a dare (safe or not)
-# :param: dare_comment: The dare to be evaluated
+# :param: dare_suggestion: The dare to be evaluated
 # :return: The evaluation of the dare (True for safe or False for not safe)
 def evaluate_dare(dare_suggestion):
         
@@ -110,12 +108,10 @@ def evaluate_dare(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)
 
-    return result == "Safe"
+    return result
 
 
-
-
-#
+# This function creates and uses an AI agent to evaluate a dare (provable by a single photo or not)
 # :param: dare_suggestion: The dare to be evaluated
 # :return: The evaluation of the dare (True or False)
 def is_provable(dare_suggestion):
@@ -160,15 +156,59 @@ def is_provable(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)    
     
-    return result == "Provable"
-
+    return result
 
 
 
 # TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
 
-def check_completion(image_path, dare_prompt):
-    pass
-
 def interpret_video(image_path):
-    pass
+    return image_path
+    
+
+# This function creates and uses an AI agent to evaluate if a user completed a dare
+# :param: image_path: The path to the image to be evaluated
+# :param: dare_suggested: The dare
+# :return: The evaluation of the dare (True or False)
+def check_completion(image_path, dare_suggested):
+
+    # Defining the Tools
+    search_tool = SerperDevTool()
+    scrape_tool = ScrapeWebsiteTool()
+
+    # AGENTS
+    check_dare = Agent(
+        role="Dare Checking Agent",
+        goal="Compares the {dare} suggested by the person to the {interpretation} to check if the dare is completed in the {interpretation}",
+        backstory="Specializing understanding the context of proving a dare, this agent uses online"
+        " resources and common sense to confirm the {dare} is indeed completed based on the actions and context in the {interpretation}",
+        verbose=True,
+        allow_delegation=False,
+        tools =[scrape_tool, search_tool]
+    )
+
+    # TASKS
+    check = Task(
+        description=(
+            "Compare the given {dare} to confirm it is completed or not, based on the {interpretation} user's action" 
+        ),
+        expected_output=(
+            "Respond by ONLY 'Dare is completed!' or 'Dare is not completed!' and no other word or explanation"
+        ),
+        agent= check_dare
+    )
+
+    # Define the crew with agents and tasks
+    dare_crew = Crew(
+        agents=[check_dare],
+        tasks=[check],
+        manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
+        verbose=True
+    )
+
+
+    # RUN
+    image_dare = {'interpretation': interpret_video(image_path), 'dare': dare_suggested}
+    result = dare_crew.kickoff(inputs=image_dare)    
+    
+    return result
