@@ -1,6 +1,7 @@
 # @Author: Bertan Berker
 # @Language: Python
-# This is a dare app AI agent that makes sure the proposed dare is nothing harmful or illegal
+# This is a file with dare app AI agents
+# The agents are used to suggest a dare and evaluate a dare
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -17,9 +18,10 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 serper_api_key = os.getenv('SERPER_API_KEY')
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 
-# TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
 
-
+# This function creates and uses an AI agent to suggest a dare to the user
+# :param: None
+# :return: The dare suggested by the agent
 def suggest_dare():
     
     # Defining the Tools
@@ -62,12 +64,10 @@ def suggest_dare():
     return result
 
 
-
-    
-
-
-
-def dare_agent(dare_comment):
+# This function creates and uses an AI agent to evaluate a dare (safe or not)
+# :param: dare_comment: The dare to be evaluated
+# :return: The evaluation of the dare (safe or not)
+def evaluate_dare(dare_comment):
         
     # Defining the Tools
     search_tool = SerperDevTool()
@@ -105,6 +105,17 @@ def dare_agent(dare_comment):
     )
 
     dare = {'dare': dare_comment}
+
     # RUN
     result = dare_crew.kickoff(inputs=dare)
     return result
+
+
+
+# TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
+
+def check_completion(video_path, dare_prompt):
+    pass
+
+def interpret_video(video_path):
+    pass
