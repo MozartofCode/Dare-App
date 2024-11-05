@@ -120,12 +120,49 @@ def evaluate_dare(dare_suggestion):
 # :return: The evaluation of the dare (True or False)
 def is_provable(dare_suggestion):
     
+    # Defining the Tools
+    search_tool = SerperDevTool()
+    scrape_tool = ScrapeWebsiteTool()
+
+    # AGENTS
+    evaluate_dare = Agent(
+        role="Dare Evaluator Agent",
+        goal="Evaluates the {dare} suggested by the person to see if it is provable by a single photo",
+        backstory="Specializing understanding the context of proving a dare by some person, this agent uses online"
+        " resources and common sense to confirm the {dare} is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED)",
+        verbose=True,
+        allow_delegation=False,
+        tools =[scrape_tool, search_tool]
+    )
+
+
+    # TASKS
+    evaluate = Task(
+        description=(
+            "Evaluate the given {dare} to confirm it is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED). The agent should provide a one word answer"
+        ),
+        expected_output=(
+            "One word answer confirming if the dare is provable by one photo or not. Ex: 'Provable', 'Not Provable'"
+        ),
+        agent= evaluate_dare
+    )
+
+    # Define the crew with agents and tasks
+    dare_crew = Crew(
+        agents=[evaluate_dare],
+        tasks=[evaluate],
+        manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
+        verbose=True
+    )
+
+    dare = {'dare': dare_suggestion}
+
+    # RUN
+    result = dare_crew.kickoff(inputs=dare)    
     
-    
-    
-    
-    result = ""
     return result == "Provable"
+
+
 
 
 # TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
