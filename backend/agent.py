@@ -165,15 +165,15 @@ def is_provable(dare_suggestion):
     return result
 
 
-
-# TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
-
-def interpret_video():
+# This function uses Clarifai API to interpret the image and get the closest concepts
+# :param: image_url: The URL of the image to be interpreted
+# :return: The primary concepts of the image
+def interpret_video(image_url):
     
     stub = service_pb2_grpc.V2Stub(ClarifaiChannel.get_grpc_channel())
     metadata = (("authorization", f"Key {clarifai_api_key}"),)
 
-    image_url = "https://samples.clarifai.com/metro-north.jpg"
+    #image_url = "https://samples.clarifai.com/metro-north.jpg"
 
     request = service_pb2.PostModelOutputsRequest(
         # This is the model ID of a publicly available General model. You may use any other public or custom model ID.
@@ -191,18 +191,19 @@ def interpret_video():
         print(response)
         raise Exception(f"Request failed, status code: {response.status}")
 
-    for concept in response.outputs[0].data.concepts:
-        print("%12s: %.2f" % (concept.name, concept.value))
-  
+    primary_concepts = []
 
-interpret_video()
+    for concept in response.outputs[0].data.concepts:
+        primary_concepts.append(concept.name)
     
+    return primary_concepts
+
 
 # This function creates and uses an AI agent to evaluate if a user completed a dare
 # :param: image_path: The path to the image to be evaluated
 # :param: dare_suggested: The dare
 # :return: The evaluation of the dare (True or False)
-def check_completion(image_path, dare_suggested):
+def check_completion(image_url, dare_suggested):
 
     # Defining the Tools
     search_tool = SerperDevTool()
@@ -238,9 +239,8 @@ def check_completion(image_path, dare_suggested):
         verbose=True
     )
 
-
     # RUN
-    image_dare = {'interpretation': interpret_video(image_path), 'dare': dare_suggested}
+    image_dare = {'interpretation': interpret_video(image_url), 'dare': dare_suggested}
     result = dare_crew.kickoff(inputs=image_dare)    
     
     return result
