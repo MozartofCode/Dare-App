@@ -10,8 +10,14 @@ from crewai_tools import ScrapeWebsiteTool, SerperDevTool
 import warnings
 warnings.filterwarnings('ignore')
 import os
+from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
+from clarifai_grpc.grpc.api import service_pb2_grpc
+from clarifai_grpc.grpc.api import service_pb2, resources_pb2
+from clarifai_grpc.grpc.api.status import status_code_pb2
 
 load_dotenv()
+clarifai_api_key = os.getenv('CLARIFAI_API_KEY')
+clarifai_application_id = os.getenv('CLARIFAI_APPLICATION_ID')
 openai_api_key = os.getenv('OPENAI_API_KEY')
 serper_api_key = os.getenv('SERPER_API_KEY')
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
@@ -162,8 +168,34 @@ def is_provable(dare_suggestion):
 
 # TODO evaluate a dare and see if the dare is done by a person (video-image recognition??)
 
-def interpret_video(image_path):
-    return image_path
+def interpret_video():
+    
+    stub = service_pb2_grpc.V2Stub(ClarifaiChannel.get_grpc_channel())
+    metadata = (("authorization", f"Key {clarifai_api_key}"),)
+
+    image_url = "https://samples.clarifai.com/metro-north.jpg"
+
+    request = service_pb2.PostModelOutputsRequest(
+        # This is the model ID of a publicly available General model. You may use any other public or custom model ID.
+        model_id="general-image-recognition",
+        user_app_id=resources_pb2.UserAppIDSet(app_id=clarifai_application_id),
+        inputs=[
+            resources_pb2.Input(
+                data=resources_pb2.Data(image=resources_pb2.Image(url=image_url))
+            )
+        ],
+    )
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        print(response)
+        raise Exception(f"Request failed, status code: {response.status}")
+
+    for concept in response.outputs[0].data.concepts:
+        print("%12s: %.2f" % (concept.name, concept.value))
+  
+
+interpret_video()
     
 
 # This function creates and uses an AI agent to evaluate if a user completed a dare
