@@ -69,3 +69,25 @@ app.post('/postDare', async (req, res) => {
     }
 });
 
+
+
+// Get the money/points earned by the user
+app.post('/getScore', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ score: user.score });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+

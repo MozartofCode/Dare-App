@@ -5,7 +5,7 @@
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from crewai import Agent, Task, Crew, Process
+from crewai import Agent, Task, Crew
 from crewai_tools import ScrapeWebsiteTool, SerperDevTool
 import warnings
 warnings.filterwarnings('ignore')
