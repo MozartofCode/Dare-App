@@ -70,7 +70,6 @@ app.post('/postDare', async (req, res) => {
 });
 
 
-
 // Get the money/points earned by the user
 app.post('/getScore', async (req, res) => {
     const { email } = req.body;
@@ -89,5 +88,13 @@ app.post('/getScore', async (req, res) => {
 });
 
 
-
+// Get top 10 users based on score
+app.get('/topScores', async (req, res) => {
+    try {
+        const topUsers = await User.find().sort({ score: -1 }).limit(10).select('email score');
+        res.status(200).json(topUsers);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
