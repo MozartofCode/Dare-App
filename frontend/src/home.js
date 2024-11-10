@@ -1,0 +1,1 @@
+// Home page that has a list of all the dares, a button to submit a dare and dashboard

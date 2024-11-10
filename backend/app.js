@@ -52,7 +52,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
 // Dare Functions
 
 // Post a dare
@@ -121,8 +120,6 @@ app.post('/uploadProof', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
-
 
 
 // Dashboard Functions
