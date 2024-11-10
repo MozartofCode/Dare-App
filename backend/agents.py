@@ -38,7 +38,7 @@ def suggest_dare():
         goal="Suggest a dare to the user",
         backstory="Specializing coming up with fun and slightly challenging dares for the game of truth or dare, this agent uses online"
         " resources and common sense to create a dare that is fun and safe",
-        verbose=True,
+        verbose=False,
         allow_delegation=False,
         tools =[scrape_tool, search_tool]
     )
@@ -61,12 +61,12 @@ def suggest_dare():
         agents=[suggest_dare],
         tasks=[suggest],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=True
+        verbose=False
     )
 
     # RUN
     result = dare_crew.kickoff()
-    return result
+    return result.raw
 
 
 # This function creates and uses an AI agent to evaluate a dare (safe or not)
@@ -84,7 +84,7 @@ def evaluate_dare(dare_suggestion):
         goal="Evaluates the {dare} suggested by the person",
         backstory="Specializing understanding the harmful and legal implications of a dare by some person, this agent uses online"
         " resources and common sense to confirm the {dare} is safe and legal.",
-        verbose=True,
+        verbose=False,
         allow_delegation=False,
         tools =[scrape_tool, search_tool]
     )
@@ -106,7 +106,7 @@ def evaluate_dare(dare_suggestion):
         agents=[evaluate_dare],
         tasks=[evaluate],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=True
+        verbose=False
     )
 
     dare = {'dare': dare_suggestion}
@@ -114,7 +114,7 @@ def evaluate_dare(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)
 
-    return result
+    return result.raw
 
 
 # This function creates and uses an AI agent to evaluate a dare (provable by a single photo or not)
@@ -132,7 +132,7 @@ def is_provable(dare_suggestion):
         goal="Evaluates the {dare} suggested by the person to see if it is provable by a single photo",
         backstory="Specializing understanding the context of proving a dare by some person, this agent uses online"
         " resources and common sense to confirm the {dare} is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED)",
-        verbose=True,
+        verbose=False,
         allow_delegation=False,
         tools =[scrape_tool, search_tool]
     )
@@ -154,7 +154,7 @@ def is_provable(dare_suggestion):
         agents=[evaluate_dare],
         tasks=[evaluate],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=True
+        verbose=False
     )
 
     dare = {'dare': dare_suggestion}
@@ -162,7 +162,7 @@ def is_provable(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)    
     
-    return result
+    return result.raw
 
 
 # This function uses Clarifai API to interpret the image and get the closest concepts
@@ -215,7 +215,7 @@ def check_completion(image_url, dare_suggested):
         goal="Compares the {dare} suggested by the person to the {interpretation} to check if the dare is completed in the {interpretation}",
         backstory="Specializing understanding the context of proving a dare, this agent uses online"
         " resources and common sense to confirm the {dare} is indeed completed based on the actions and context in the {interpretation}",
-        verbose=True,
+        verbose=False,
         allow_delegation=False,
         tools =[scrape_tool, search_tool]
     )
@@ -236,11 +236,11 @@ def check_completion(image_url, dare_suggested):
         agents=[check_dare],
         tasks=[check],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=True
+        verbose=False
     )
 
     # RUN
     image_dare = {'interpretation': interpret_video(image_url), 'dare': dare_suggested}
     result = dare_crew.kickoff(inputs=image_dare)    
     
-    return result
+    return result.raw

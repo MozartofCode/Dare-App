@@ -95,7 +95,7 @@ app.post('/postDare', async (req, res) => {
                 console.error(error);
             });
 
-        user.proposedDare.push(dare);
+        user.proposedDares.push(dare);
         await user.save();
         res.status(200).json({ message: 'Dare posted successfully' });
     }

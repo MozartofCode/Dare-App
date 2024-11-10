@@ -3,8 +3,6 @@
 # This file is the main API file for the backend. It is responsible for handling all the requests and responses from the node.js backend
 # with the AI agents
 
-host = os.getenv('FLASK_RUN_HOST', '127.0.0.1')
-port = int(os.getenv('FLASK_RUN_PORT', 5000))
 
 from flask import Flask, request, jsonify
 from agents import suggest_dare, evaluate_dare, is_provable, check_completion
@@ -21,12 +19,16 @@ def api_suggest_dare():
 def api_evaluate_dare():
     dare_suggestion = request.json.get('dare_suggestion')
     result = evaluate_dare(dare_suggestion)
+    print("RESULT IS")
+    print(result)
     return jsonify(result)
 
 @app.route('/is_provable', methods=['POST'])
 def api_is_provable():
     dare_suggestion = request.json.get('dare_suggestion')
     result = is_provable(dare_suggestion)
+    print("RESULT IS")
+    print(result)
     return jsonify(result)
 
 @app.route('/check_completion', methods=['POST'])
@@ -37,4 +39,4 @@ def api_check_completion():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
