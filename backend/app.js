@@ -6,6 +6,7 @@ const app = express();
 const User = require('./models/user'); // Import User model
 
 const port = process.env.PORT || 3000;
+const axios = require('axios');
 
 app.use(express.json());
 
@@ -65,9 +66,34 @@ app.post('/postDare', async (req, res) => {
         }
 
         // Checking if the proposed dare by the user is acceptable based on the AI Agents
-        // TODO
-        // TODO
+        axios.post('http://localhost:5000/evaluate_dare', { dare_suggestion: dare })
+            .then(response => {
+                console.log(response.data);
+                if (response.data === 'Safe') {
+                    console.log('Dare is safe');
+                }
+                else {
+                    return res.status(400).json({ message: 'Dare is not safe! Try again...' });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        
 
+        axios.post('http://localhost:5000/is_provable', { dare_suggestion: dare })
+            .then(response => {
+                console.log(response.data);
+                if (response.data === 'Provable') {
+                    console.log('Dare is provable');
+                }
+                else {
+                    return res.status(400).json({ message: 'Dare is not provable! Try again...' });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
 
         user.proposedDare.push(dare);
         await user.save();
@@ -80,14 +106,24 @@ app.post('/postDare', async (req, res) => {
 
 
 
+// Get the dares proposed by every user
+app.get('/getProposedDares', async (req, res) => {
+    try {
+        const users = await User.find().select('proposedDares');
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
 // Suggestions for dares
 app.get('/getDareSuggestion', async (req, res) => {
     try {
-        // Fetching dares from the AI Agents
-        // TODO
-        // TODO
-
-        res.status(200).json({ message: 'Dare suggestions fetched successfully' });
+        const response = await axios.get('http://localhost:5000/suggest_dare');
+        const dareSuggestion = response.data;
+        res.status(200).json({ message: dareSuggestion });
     }
     catch (err) {
         res.status(500).json({ message: err.message });
