@@ -21,13 +21,14 @@ app.listen(port, () => {
 });
 
 
+// Login and Registration Functions
 
-// User registration
+// Registration
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const newUser = new User({ email, password });
+        const newUser = new User({ email, password, score: 0, proposedDares: [], acceptedDares: [] });
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);
     } catch (err) {
@@ -36,7 +37,7 @@ app.post('/register', async (req, res) => {
 });
 
 
-// User login
+// Login
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -52,6 +53,9 @@ app.post('/login', async (req, res) => {
 });
 
 
+// Dare Functions
+
+// Post a dare
 app.post('/postDare', async (req, res) => {
     const { email, dare } = req.body;
 
@@ -60,7 +64,13 @@ app.post('/postDare', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        user.dares.push(dare);
+
+        // Checking if the proposed dare by the user is acceptable based on the AI Agents
+        // TODO
+        // TODO
+
+
+        user.proposedDare.push(dare);
         await user.save();
         res.status(200).json({ message: 'Dare posted successfully' });
     }
@@ -69,6 +79,53 @@ app.post('/postDare', async (req, res) => {
     }
 });
 
+
+
+// Suggestions for dares
+app.get('/getDareSuggestion', async (req, res) => {
+    try {
+        // Fetching dares from the AI Agents
+        // TODO
+        // TODO
+
+        res.status(200).json({ message: 'Dare suggestions fetched successfully' });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+// Uploading an image proof for a dare & checking if the dare is accepted
+app.post('/uploadProof', async (req, res) => {
+    const { email, dare, image } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Checking if the dare is accepted by the AI Agents
+        // TODO 
+        // TODO
+        
+        user.acceptedDares.push(dare);
+        user.score += 10; // Incrementing the score of the user
+        await user.save();
+        res.status(200).json({ message: 'Proof uploaded successfully' });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+
+// Dashboard Functions
 
 // Get the money/points earned by the user
 app.post('/getScore', async (req, res) => {
@@ -97,4 +154,3 @@ app.get('/topScores', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
