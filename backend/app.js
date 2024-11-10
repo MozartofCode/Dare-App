@@ -131,10 +131,30 @@ app.get('/getDareSuggestion', async (req, res) => {
 });
 
 
+// Accepting a dare
+app.post('/acceptDare', async (req, res) => {
+    const { email, dare } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.acceptedDares.push(dare);
+        await user.save();
+        res.status(200).json({ message: 'Dare accepted successfully' });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 
 // Uploading an image proof for a dare & checking if the dare is accepted
 app.post('/uploadProof', async (req, res) => {
-    const { email, dare, image } = req.body;
+    const { email, dare, image_url} = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -142,15 +162,24 @@ app.post('/uploadProof', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        // Checking if the dare is accepted by the AI Agents
-        // TODO 
-        // TODO
         
-        user.acceptedDares.push(dare);
-        user.score += 10; // Incrementing the score of the user
+        axios.post('http://localhost:5000/check_completion', { image_url: image_url, dare_suggested: dare })
+            .then(response => {
+                console.log(response.data);
+                if (response.data === 'Dare is completed!') {
+                    console.log('Dare is completed');
+                }
+                else {
+                    return res.status(400).json({ message: 'Dare is not completed! Try again...' });
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        user.score += 10; 
         await user.save();
-        res.status(200).json({ message: 'Proof uploaded successfully' });
+        res.status(200).json({ message: 'Dare is completed successfully' });
     }
     catch (err) {
         res.status(500).json({ message: err.message });
