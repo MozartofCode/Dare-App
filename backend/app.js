@@ -190,7 +190,7 @@ app.post('/uploadProof', async (req, res) => {
 // Dashboard Functions
 
 // Get the money/points earned by the user
-app.post('/getScore', async (req, res) => {
+app.get('/getScore', async (req, res) => {
     const { email } = req.body;
 
     try {
