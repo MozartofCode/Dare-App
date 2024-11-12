@@ -19,17 +19,12 @@ def api_suggest_dare():
 def api_evaluate_dare():
     dare_suggestion = request.json.get('dare_suggestion')
     result = evaluate_dare(dare_suggestion)
-    print("RESULT IS")
-    print(result)
+    
+    if result == "Safe":
+         result = is_provable(dare_suggestion)
+    
     return jsonify(result)
 
-@app.route('/is_provable', methods=['POST'])
-def api_is_provable():
-    dare_suggestion = request.json.get('dare_suggestion')
-    result = is_provable(dare_suggestion)
-    print("RESULT IS")
-    print(result)
-    return jsonify(result)
 
 @app.route('/check_completion', methods=['POST'])
 def api_check_completion():

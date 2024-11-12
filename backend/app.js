@@ -69,32 +69,17 @@ app.post('/postDare', async (req, res) => {
         axios.post('http://localhost:5000/evaluate_dare', { dare_suggestion: dare })
             .then(response => {
                 console.log(response.data);
-                if (response.data === 'Safe') {
+                if (response.data === 'Provable') {
                     console.log('Dare is safe');
                 }
                 else {
-                    return res.status(400).json({ message: 'Dare is not safe! Try again...' });
+                    return res.status(400).json({ message: 'Dare is not safe or not provable! Try again...' });
                 }
             })
             .catch(error => {
                 console.error(error);
             });
         
-
-        axios.post('http://localhost:5000/is_provable', { dare_suggestion: dare })
-            .then(response => {
-                console.log(response.data);
-                if (response.data === 'Provable') {
-                    console.log('Dare is provable');
-                }
-                else {
-                    return res.status(400).json({ message: 'Dare is not provable! Try again...' });
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            });
-
         user.proposedDares.push(dare);
         await user.save();
         res.status(200).json({ message: 'Dare posted successfully' });
