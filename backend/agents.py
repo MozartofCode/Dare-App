@@ -69,7 +69,7 @@ def suggest_dare():
     return result.raw
 
 
-# This function creates and uses an AI agent to evaluate a dare (safe or not)
+# This function creates and uses an AI agent to evaluate a dare (safe or not) & Provable by a single photo or not
 # :param: dare_suggestion: The dare to be evaluated
 # :return: The evaluation of the dare (True for safe or False for not safe)
 def evaluate_dare(dare_suggestion):
@@ -89,21 +89,31 @@ def evaluate_dare(dare_suggestion):
         tools =[scrape_tool, search_tool]
     )
 
+    analyze_dare = Agent(
+        role="Dare Analyzer Agent",
+        goal="Evaluates the {dare} suggested by the person to see if it is provable by a single photo",
+        backstory="Specializing understanding the context of proving a dare by some person, this agent uses online"
+        " resources and common sense to confirm the {dare} is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED)",
+        verbose=False,
+        allow_delegation=False,
+        tools =[scrape_tool, search_tool]
+    )
 
-    # TASKS
     evaluate = Task(
         description=(
-            "Evaluate the given {dare} to confirm it is safe and legal or not. The agent should provide a one word answer"
+            "Evaluate the given {dare} to confirm it is safe and legal and can be provable by a SINGLE PHOTO."
+             " The agent should return True if the dare is safe and legal and can be proven by a single photo, and False otherwise."
         ),
         expected_output=(
-            "One word answer confirming if the dare is safe or not. Ex: 'Safe', 'Not Safe'"
+            "Respond by 'True' if the dare is safe and legal and can be proven by a single photo, and 'False' otherwise."
         ),
-        agent= evaluate_dare
+        agent=[evaluate_dare, analyze_dare],
+        output_pydantic= {"dare": str, "is_approved": bool}
     )
 
     # Define the crew with agents and tasks
     dare_crew = Crew(
-        agents=[evaluate_dare],
+        agents=[evaluate_dare, analyze_dare],
         tasks=[evaluate],
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
         verbose=False
@@ -114,54 +124,6 @@ def evaluate_dare(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)
 
-    return result.raw
-
-
-# This function creates and uses an AI agent to evaluate a dare (provable by a single photo or not)
-# :param: dare_suggestion: The dare to be evaluated
-# :return: The evaluation of the dare (True or False)
-def is_provable(dare_suggestion):
-    
-    # Defining the Tools
-    search_tool = SerperDevTool()
-    scrape_tool = ScrapeWebsiteTool()
-
-    # AGENTS
-    evaluate_dare = Agent(
-        role="Dare Evaluator Agent",
-        goal="Evaluates the {dare} suggested by the person to see if it is provable by a single photo",
-        backstory="Specializing understanding the context of proving a dare by some person, this agent uses online"
-        " resources and common sense to confirm the {dare} is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED)",
-        verbose=False,
-        allow_delegation=False,
-        tools =[scrape_tool, search_tool]
-    )
-
-
-    # TASKS
-    evaluate = Task(
-        description=(
-            "Evaluate the given {dare} to confirm it is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED). The agent should provide a one word answer"
-        ),
-        expected_output=(
-            "One word answer confirming if the dare is provable by one photo or not. Ex: 'Provable', 'Not Provable'"
-        ),
-        agent= evaluate_dare
-    )
-
-    # Define the crew with agents and tasks
-    dare_crew = Crew(
-        agents=[evaluate_dare],
-        tasks=[evaluate],
-        manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=False
-    )
-
-    dare = {'dare': dare_suggestion}
-
-    # RUN
-    result = dare_crew.kickoff(inputs=dare)    
-    
     return result.raw
 
 
