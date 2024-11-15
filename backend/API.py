@@ -5,7 +5,7 @@
 
 
 from flask import Flask, request, jsonify
-from agents import suggest_dare, evaluate_dare, is_provable, check_completion
+from agents import suggest_dare, evaluate_dare, check_completion
 import os
 
 app = Flask(__name__)
@@ -19,11 +19,7 @@ def api_suggest_dare():
 def api_evaluate_dare():
     dare_suggestion = request.json.get('dare_suggestion')
     result = evaluate_dare(dare_suggestion)
-    
-    if result == "Safe":
-         result = is_provable(dare_suggestion)
-    
-    return jsonify(result)
+    return jsonify(result['is_provable'])
 
 
 @app.route('/check_completion', methods=['POST'])

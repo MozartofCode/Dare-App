@@ -60,10 +60,15 @@ def test_get_topScores():
     response = requests.get(f'{BASE_URL}/topScores')
     print('Get Top Scores Response:', response.json())
 
-#test_register('testUser', '1111')
-#test_login('testUser', '1111')
-#test_login('testUser', '1121')
+# SUCCESSFUL TESTS
+#test_register('testUser1', '1111')
+#test_login('testUser1', '1111')
+
+
+# CURRENTLY TESTING
+
 test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
+
 # test_get_proposed_dares()
 # get_dare_suggestion()
 # test_accepting_dare('testUser', 'I dare you to eat an onion while running really fast')

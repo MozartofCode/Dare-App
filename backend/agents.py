@@ -124,7 +124,7 @@ def evaluate_dare(dare_suggestion):
     # RUN
     result = dare_crew.kickoff(inputs=dare)
 
-    return result.raw
+    return result
 
 
 # This function uses Clarifai API to interpret the image and get the closest concepts
