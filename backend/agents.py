@@ -107,7 +107,7 @@ def evaluate_dare(dare_suggestion):
         expected_output=(
             "Respond by 'True' if the dare is safe and legal and can be proven by a single photo, and 'False' otherwise."
         ),
-        agent=[evaluate_dare, analyze_dare],
+        agents=[evaluate_dare, analyze_dare],
         output_pydantic= {"dare": str, "is_approved": bool}
     )
 
