@@ -63,14 +63,12 @@ def test_get_topScores():
 # SUCCESSFUL TESTS
 #test_register('testUser1', '1111')
 #test_login('testUser1', '1111')
-
+# test_get_proposed_dares()
+# get_dare_suggestion()
 
 # CURRENTLY TESTING
 
-test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
-
-# test_get_proposed_dares()
-# get_dare_suggestion()
+#test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
 # test_accepting_dare('testUser', 'I dare you to eat an onion while running really fast')
 # test_upload_proof('testUser', 'I dare you to eat an onion while running really fast', 'http://example.com/proof.jpg')
 # test_get_score('testUser')
