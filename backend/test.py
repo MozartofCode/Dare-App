@@ -65,11 +65,11 @@ def test_get_topScores():
 #test_login('testUser1', '1111')
 # test_get_proposed_dares()
 # get_dare_suggestion()
+# test_get_topScores()
 
 # CURRENTLY TESTING
 
-#test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
+# test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
 # test_accepting_dare('testUser', 'I dare you to eat an onion while running really fast')
 # test_upload_proof('testUser', 'I dare you to eat an onion while running really fast', 'http://example.com/proof.jpg')
-# test_get_score('testUser')
-# test_get_topScores()
+test_get_score('testUser1')
