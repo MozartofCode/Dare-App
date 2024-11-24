@@ -43,6 +43,10 @@ def test_accepting_dare(email, dare):
     response = requests.post(f'{BASE_URL}/acceptDare', json=data)
     print('Accept Dare Response:', response.json())
 
+def test_get_accepted_dares(email):
+    response = requests.get(f'{BASE_URL}/getAcceptedDares', params={'email': email})
+    print('Get Accepted Dares Response:', response.json())
+
 
 def test_upload_proof(email, dare, image_url):
     # Make a POST request with data
@@ -67,10 +71,12 @@ def test_get_topScores():
 # get_dare_suggestion()
 # test_get_topScores()
 # test_get_score('testUser')
+# test_accepting_dare('testUser', 'I dare you to eat an onion while running really fast')
+# test_get_accepted_dares('testUser')
+
 
 # CURRENTLY TESTING
 
-test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
-# test_accepting_dare('testUser', 'I dare you to eat an onion while running really fast')
+# test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
 # test_upload_proof('testUser', 'I dare you to eat an onion while running really fast', 'http://example.com/proof.jpg')
 
