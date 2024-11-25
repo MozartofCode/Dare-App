@@ -69,7 +69,7 @@ app.post('/postDare', async (req, res) => {
         axios.post('http://localhost:5000/evaluate_dare', { dare_suggestion: dare })
             .then(response => {
                 console.log(response.data);
-                if (response.data === 'True') {
+                if (response.data === 'true') {
                     console.log('Dare is safe');
                 }
                 else {

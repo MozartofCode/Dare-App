@@ -77,6 +77,9 @@ def test_get_topScores():
 
 # CURRENTLY TESTING
 
-# test_post_dare('testUser', 'I dare you to eat an onion while running really fast')
+test_post_dare('testUser', 'I dare you to eat twenty onions while running really fast')
+
+
+
 # test_upload_proof('testUser', 'I dare you to eat an onion while running really fast', 'http://example.com/proof.jpg')
 

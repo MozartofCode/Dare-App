@@ -23,6 +23,13 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 serper_api_key = os.getenv('SERPER_API_KEY')
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 
+from pydantic import BaseModel
+
+# Define output schema
+class OutputPydantic(BaseModel):
+    approved: bool
+
+
 # This function creates and uses an AI agent to suggest a dare to the user
 # :param: None
 # :return: The dare suggested by the agent
@@ -73,56 +80,42 @@ def suggest_dare():
 # :param: dare_suggestion: The dare to be evaluated
 # :return: The evaluation of the dare (True for safe or False for not safe)
 def evaluate_dare(dare_suggestion):
-        
-    # Defining the Tools
+    # Define tools
     search_tool = SerperDevTool()
     scrape_tool = ScrapeWebsiteTool()
 
-    # AGENTS
-    evaluate_dare = Agent(
+    # Define agent
+    evaluate_dare_agent = Agent(
         role="Dare Evaluator Agent",
-        goal="Evaluates the {dare} suggested by the person",
-        backstory="Specializing understanding the harmful and legal implications of a dare by some person, this agent uses online"
-        " resources and common sense to confirm the {dare} is safe and legal.",
+        goal="Evaluates the dare suggested by the user. Determines if the dare is safe, legal, and provable by a single photo.",
+        backstory="Specializes in understanding the potential safety and legal risks of a dare, as well as the feasibility of proving it with a photo.",
         verbose=False,
         allow_delegation=False,
-        tools =[scrape_tool, search_tool]
+        tools=[scrape_tool, search_tool],
     )
 
-    analyze_dare = Agent(
-        role="Dare Analyzer Agent",
-        goal="Evaluates the {dare} suggested by the person to see if it is provable by a single photo",
-        backstory="Specializing understanding the context of proving a dare by some person, this agent uses online"
-        " resources and common sense to confirm the {dare} is provable by A SINGLE photo (VIDEOS ARE NOT ALLOWED)",
-        verbose=False,
-        allow_delegation=False,
-        tools =[scrape_tool, search_tool]
-    )
-
-    evaluate = Task(
+    # Define the task
+    evaluate_task = Task(
         description=(
-            "Evaluate the given {dare} to confirm it is safe and legal and can be provable by a SINGLE PHOTO."
-             " The agent should return True if the dare is safe and legal and can be proven by a single photo, and False otherwise."
+            "Evaluate the given dare to confirm it is safe, legal, and provable by a SINGLE PHOTO. "
+            "The agent should return 'True' if the dare meets all criteria and 'False' otherwise."
         ),
-        expected_output=(
-            "Respond by 'True' if the dare is safe and legal and can be proven by a single photo, and 'False' otherwise."
-        ),
-        agents=[evaluate_dare, analyze_dare],
-        output_pydantic= {"dare": str, "is_approved": bool}
+        expected_output="Respond by 'true' if the dare is safe, legal, and provable by a single photo, and 'false' otherwise.",
+        output_pydantic=OutputPydantic,
+        agent= evaluate_dare_agent
     )
 
-    # Define the crew with agents and tasks
+    # Initialize Crew
     dare_crew = Crew(
-        agents=[evaluate_dare, analyze_dare],
-        tasks=[evaluate],
+        agents=[evaluate_dare_agent],
+        tasks=[evaluate_task],  # Assign the task
         manager_llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7),
-        verbose=False
+        verbose=False,
     )
 
-    dare = {'dare': dare_suggestion}
-
-    # RUN
-    result = dare_crew.kickoff(inputs=dare)
+    # Run the Crew with the given dare
+    dare_input = {"dare": dare_suggestion}
+    result = dare_crew.kickoff(inputs=dare_input)
 
     return result
 

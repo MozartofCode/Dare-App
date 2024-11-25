@@ -19,7 +19,8 @@ def api_suggest_dare():
 def api_evaluate_dare():
     dare_suggestion = request.json.get('dare_suggestion')
     result = evaluate_dare(dare_suggestion)
-    return jsonify(result['is_provable'])
+    print(result)
+    return jsonify(result['approved'])
 
 
 @app.route('/check_completion', methods=['POST'])
