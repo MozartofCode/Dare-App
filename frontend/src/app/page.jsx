@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useCallback } from "react";  // Add useState here
-
+import { useRouter } from "next/navigation";  // Import useRouter
 
 function MainComponent() {
+  const router = useRouter(); // Initialize router
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: "",
@@ -45,24 +46,33 @@ function MainComponent() {
     async (e) => {
       e.preventDefault();
       if (!validateForm()) return;
-
+  
       setLoading(true);
       try {
-        // Here you would connect to your backend
-        const endpoint = isLogin ? "/api/login" : "/api/register";
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Reset form after successful submission
-        setFormData({ username: "", email: "", password: "" });
-        setError(null);
+        const endpoint = isLogin ? "/login" : "/register";
+        
+        // Send request to backend
+        const response = await fetch(`http://localhost:3000${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          throw new Error(data.message || "Something went wrong");
+        }
+  
+        // Instead of saving a token, just redirect to the dashboard
+        router.push("/dashboard");  
       } catch (err) {
         setError(err.message || "An error occurred");
       } finally {
         setLoading(false);
       }
     },
-    [formData, isLogin, validateForm]
+    [formData, isLogin, validateForm, router]
   );
 
   const toggleForm = useCallback(() => {
